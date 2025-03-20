@@ -1,14 +1,16 @@
-group = "io.agora.agorartm.agora_rtm"
-version = "1.0"
+group 'io.agora.agora_rtm'
+version '1.0-SNAPSHOT'
 
 buildscript {
+    ext.kotlin_version = '1.6.10'
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:7.3.0")
+        classpath 'com.android.tools.build:gradle:7.1.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -19,59 +21,32 @@ rootProject.allprojects {
     }
 }
 
-apply plugin: "com.android.library"
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 
 android {
-    if (project.android.hasProperty("namespace")) {
-        namespace = "io.agora.agorartm.agora_rtm"
-    }
-
-    compileSdk = 34
+    compileSdkVersion 31
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    defaultConfig {
-        minSdk = 16
-        consumerProguardFiles 'consumer-rules.pro'
+    kotlinOptions {
+        jvmTarget = '1.8'
     }
 
     sourceSets {
-        if (isDev(project)) {
-           println("Include libs/ to jniLibs.srcDirs for debugging.")
-           main.jniLibs.srcDirs += 'libs'
-        }
+        main.java.srcDirs += 'src/main/kotlin'
     }
 
-    dependencies {
-        testImplementation("junit:junit:4.13.2")
-        testImplementation("org.mockito:mockito-core:5.0.0")
-    }
-
-    testOptions {
-        unitTests.all {
-            testLogging {
-               events "passed", "skipped", "failed", "standardOut", "standardError"
-               outputs.upToDateWhen {false}
-               showStandardStreams = true
-            }
-        }
+    defaultConfig {
+        minSdkVersion 16
     }
 }
 
 dependencies {
-  if (isDev(project)) {
-    println("Include libs/*jar for debugging.")
-    api fileTree(dir: "libs", include: ["*.jar"])
-  } else {
-    api 'io.agora.rtm:iris-rtm:2.2.1-build.1'
-    api 'io.agora:agora-rtm:2.2.1'
-  }
-}
+    api 'io.agora.rtm:rtm-sdk:1.5.3'
 
-static boolean isDev(Project project) {
-    def devFile = new File(project.projectDir, '../.plugin_dev')
-    return devFile.exists()
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
